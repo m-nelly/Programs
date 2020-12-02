@@ -6,28 +6,25 @@
 
 import pythonping as p
 import ipaddress as ip
+import sys
 
 # Perform a basic ping of your loopback address with regular output.
 
 test = p.ping('127.0.0.1', count=10)
-print(test._responses[0].success)
+print(test.success)
 
 # parameters: size(bytes), timout(seconds), count(# of pings), out(defines a location to send verbose data, def sys.stdout)
 
-def pingSweep(startAddress= None, endAddress = None, subnetMask = None, cidrNetwork = None, numPings = 4):
-
-# The purpose of these arguments is to allow the user freedom in how they approach the network. 
+def pingSweep(cidrNetwork = None, numPings = 4, pingTimeout = 0.15, pingSize = 9, pingOut = sys.stdout):
 
     for x in ip.ip_network(cidrNetwork):
-        response = p.ping(str(x), count=4, timeout = 0.025)
-        for y in range(4):
+        response = p.ping(str(x), count=numPings, timeout = pingTimeout, size = pingSize, out = pingOut)
+        for y in range(numPings):
 
             if response._responses[y].success == True:
                 print(x)
                 break
             else:
                 continue
-        
-userNetwork = str(input('Network(CIDR): '))
 
-pingSweep(cidrNetwork=userNetwork)
+pingSweep(cidrNetwork='73.0.0.0/8', pingTimeout= 0.03, numPings = 2) # Enter desired network here and run. 73.0.0.0/8 is Comcast btw
